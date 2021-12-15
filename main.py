@@ -17,7 +17,7 @@ if __name__ == '__main__':
     pygame.display.set_caption("Game!")
 
     screen_handler = ScreenHandler(window)
-    screen_handler.create_score_box(400, 5)
+    screen_handler.create_score_box(**config['scorebox'])
     screen_handler.create_player(250, window.get_height(
     ) - 15 - config['window']['bottom_vertical_buffer'], 25, 15)
     generate_enemy_grid(screen_handler)

@@ -17,7 +17,7 @@ from src.screen_objects import (
 )
 
 config = get_config()
-BG_COLOR = BLACK
+BG_COLOR = BLACK  # TODO - make a more interesting background
 
 EXPLOSION_SOUND = pygame.mixer.Sound('data/sounds/explosion.wav')
 
