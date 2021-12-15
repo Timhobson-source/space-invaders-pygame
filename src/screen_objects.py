@@ -26,9 +26,11 @@ ENEMY_SHOOTING_RECOIL_TIME = 3  # seconds
 
 DEFAULT_FONT = pygame.font.get_default_font()
 
+# Keep shoot sounds separate as likely will to change them to different
+# sounds down the line
 pygame.mixer.init()
-PLAYER_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/player-shoot-sound.wav")
-ENEMY_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/enemy-shoot-sound.wav")
+PLAYER_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
+ENEMY_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
 
 
 class ScreenObjectFactory:
@@ -131,7 +133,7 @@ class Player(Character):
 
             # create a bullet object
             screen_handler.create_player_bullet(
-                self.x, self.y, bullet_speed, bullet_radius, self.window)
+                self.x, self.y, bullet_speed, bullet_radius)
 
 
 class Enemy(Character):
@@ -179,7 +181,7 @@ class ShootingEnemy(Enemy):
 
         # create a bullet object
         screen_handler.create_enemy_bullet(
-            self.x, self.y, bullet_speed, bullet_radius, self.window)
+            self.x, self.y, bullet_speed, bullet_radius)
 
 
 class PlayerBullet(Character):

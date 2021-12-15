@@ -2,6 +2,7 @@ import pygame
 
 from config import get_config
 from src.screen import ScreenHandler
+from src.helpers import generate_enemy_grid
 
 
 if __name__ == '__main__':
@@ -16,12 +17,10 @@ if __name__ == '__main__':
     pygame.display.set_caption("Game!")
 
     screen_handler = ScreenHandler(window)
-    screen_handler.create_score_box(400, 5, window)
+    screen_handler.create_score_box(400, 5)
     screen_handler.create_player(250, window.get_height(
-    ) - 15 - config['window']['bottom_vertical_buffer'], 25, 15, window)
-    screen_handler.create_shooting_enemy(100, 200, 25, 10, window)
-    for i in range(1, 6):
-        screen_handler.create_standard_enemy(100 + i*50, 200, 25, 10, window)
+    ) - 15 - config['window']['bottom_vertical_buffer'], 25, 15)
+    generate_enemy_grid(screen_handler)
 
     running = True
     while running:
