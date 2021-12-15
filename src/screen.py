@@ -7,7 +7,7 @@ from config import get_config
 from src.game_meta import GameMeta
 from src.screen_objects import (
     Player,
-    Bullet,
+    PlayerBullet,
     Enemy,
     ScoreBox,
     ScreenObjectFactory,
@@ -37,14 +37,14 @@ class ScreenHandler:
     def cleanup_off_screen_objects(self):
         offscreen_objects = [
             object for object in self.screen_objects
-            if isinstance(object, Bullet) and object.is_offscreen()
+            if isinstance(object, PlayerBullet) and object.is_offscreen()
         ]
         for object in offscreen_objects:
             self.remove_screen_object(object)
 
     def cleanup_destroyed_enemies(self):
         bullets = [
-            obj for obj in self.screen_objects if isinstance(obj, Bullet)]
+            obj for obj in self.screen_objects if isinstance(obj, PlayerBullet)]
         enemies = [
             obj for obj in self.screen_objects if isinstance(obj, Enemy)]
 
@@ -83,7 +83,7 @@ class ScreenHandler:
 
     def create_bullet(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
         args = [x, y, vel, radius, window]
-        obj = self.screen_object_factory.create(Bullet, *args)
+        obj = self.screen_object_factory.create(PlayerBullet, *args)
         self.screen_objects.append(obj)
 
     def create_score_box(self, x: int, y: int, window: pygame.Surface):

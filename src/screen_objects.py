@@ -19,6 +19,10 @@ SHOOTING_RECOIL_TIME = 0.3  # seconds
 
 DEFAULT_FONT = pygame.font.get_default_font()
 
+pygame.mixer.init()
+PLAYER_SHOOT_SOUND = pygame.mixer.Sound(
+    "data/sounds/player-shoot-sound.wav")
+
 
 class ScreenObjectFactory:
     def __init__(self):
@@ -117,6 +121,9 @@ class Player(Character):
 
         cur_time = time.time()
         if not self.last_bullet_time or cur_time - self.last_bullet_time > SHOOTING_RECOIL_TIME:
+            # play shooting sound effect
+            pygame.mixer.Sound.play(PLAYER_SHOOT_SOUND)
+
             self.last_bullet_time = cur_time
 
             # create a bullet object
@@ -134,7 +141,7 @@ class Enemy(Character):
         pass
 
 
-class Bullet(Character):
+class PlayerBullet(Character):
 
     color: tuple = PURPLE
     label: str = ''

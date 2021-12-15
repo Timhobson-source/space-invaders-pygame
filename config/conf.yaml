@@ -7,7 +7,7 @@ window:
   bottom_vertical_buffer: 0
 
 bullet:
-  speed: 20
+  speed: 25
   radius: 5
 
 enemy:
