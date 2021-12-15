@@ -2,7 +2,6 @@ import math
 
 import pygame
 
-
 from config import get_config
 from src.game_meta import GameMeta
 from src.screen_objects import (
@@ -16,6 +15,8 @@ from src.screen_objects import (
 
 config = get_config()
 BG_COLOR = BLACK
+
+EXPLOSION_SOUND = pygame.mixer.Sound('data/sounds/explosion.wav')
 
 
 class ScreenHandler:
@@ -59,6 +60,10 @@ class ScreenHandler:
                     (enemy.y - bullet.y)**2
                 )
                 if dist <= enemy.radius + bullet.radius:
+                    # play explosion sound for collision
+                    pygame.mixer.Sound.play(EXPLOSION_SOUND)
+
+                    # remove relevant objects from screen
                     self.remove_screen_object(enemy)
                     self.remove_screen_object(bullet)
                     self.game_meta.increase_points(
