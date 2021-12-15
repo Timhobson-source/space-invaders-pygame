@@ -1,5 +1,4 @@
 
-
 class GameMeta:
     def __init__(self, start_lives=3, start_points=0):
         self.lives = start_lives
