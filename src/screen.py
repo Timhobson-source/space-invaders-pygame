@@ -7,7 +7,10 @@ from src.game_meta import GameMeta
 from src.screen_objects import (
     Player,
     PlayerBullet,
+    EnemyBullet,
     Enemy,
+    ShootingEnemy,
+    StandardEnemy,
     ScoreBox,
     ScreenObjectFactory,
     BLACK,
@@ -38,7 +41,7 @@ class ScreenHandler:
     def cleanup_off_screen_objects(self):
         offscreen_objects = [
             object for object in self.screen_objects
-            if isinstance(object, PlayerBullet) and object.is_offscreen()
+            if isinstance(object, (PlayerBullet, EnemyBullet)) and object.is_offscreen()
         ]
         for object in offscreen_objects:
             self.remove_screen_object(object)
@@ -67,7 +70,7 @@ class ScreenHandler:
                     self.remove_screen_object(enemy)
                     self.remove_screen_object(bullet)
                     self.game_meta.increase_points(
-                        config['enemy']['point_value']
+                        enemy.point_value
                     )
 
     def register_screen_object(self, object):
@@ -81,14 +84,24 @@ class ScreenHandler:
         obj = self.screen_object_factory.create(Player, *args)
         self.screen_objects.append(obj)
 
-    def create_enemy(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
+    def create_standard_enemy(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
         args = [x, y, vel, radius, window]
-        obj = self.screen_object_factory.create(Enemy, *args)
+        obj = self.screen_object_factory.create(StandardEnemy, *args)
         self.screen_objects.append(obj)
 
-    def create_bullet(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
+    def create_shooting_enemy(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
+        args = [x, y, vel, radius, window]
+        obj = self.screen_object_factory.create(ShootingEnemy, *args)
+        self.screen_objects.append(obj)
+
+    def create_player_bullet(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
         args = [x, y, vel, radius, window]
         obj = self.screen_object_factory.create(PlayerBullet, *args)
+        self.screen_objects.append(obj)
+
+    def create_enemy_bullet(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
+        args = [x, y, vel, radius, window]
+        obj = self.screen_object_factory.create(EnemyBullet, *args)
         self.screen_objects.append(obj)
 
     def create_score_box(self, x: int, y: int, window: pygame.Surface):

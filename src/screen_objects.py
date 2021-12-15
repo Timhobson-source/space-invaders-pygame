@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import time
+import random
 
 import pygame
 
@@ -8,20 +9,26 @@ from src.helpers import clip_value
 
 config = get_config()
 
+# TODO - move all constants into a constants file
+# which handles font and sound inits?
+
 # Colours in RGB format
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 PURPLE = (102, 0, 102)
+GREEN = (0, 255, 0)
 
-SHOOTING_RECOIL_TIME = 0.3  # seconds
+PLAYER_SHOOTING_RECOIL_TIME = 0.3  # seconds
+ENEMY_SHOOTING_RECOIL_TIME = 3  # seconds
+# TODO - ^Make this variable for different levels of difficulty
 
 DEFAULT_FONT = pygame.font.get_default_font()
 
 pygame.mixer.init()
-PLAYER_SHOOT_SOUND = pygame.mixer.Sound(
-    "data/sounds/player-shoot-sound.wav")
+PLAYER_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/player-shoot-sound.wav")
+ENEMY_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/enemy-shoot-sound.wav")
 
 
 class ScreenObjectFactory:
@@ -99,11 +106,6 @@ class Player(Character):
             self.x -= self.vel
         if keys[pygame.K_RIGHT]:
             self.x += self.vel
-        # remove y move for now
-        # if keys[pygame.K_UP]:
-        #     self.y -= self.vel
-        # if keys[pygame.K_DOWN]:
-        #     self.y += self.vel
         if keys[pygame.K_SPACE]:
             self.shoot(screen_handler)
 
@@ -113,32 +115,71 @@ class Player(Character):
             config['window']['right_horizontal_buffer']
         self.x = clip_value(self.x, min_x, max_x)
 
-    def shoot(self, screen_handler, bullet_speed=None, bullet_radius=None):
-        if bullet_speed is None:
-            bullet_speed = config['bullet']['speed']
-        if bullet_radius is None:
-            bullet_radius = config['bullet']['radius']
+    def shoot(self, screen_handler):
+        # TODO - move this into init?
+        bullet_speed = config['player']['bullet']['speed']
+        bullet_radius = config['player']['bullet']['radius']
 
         cur_time = time.time()
-        if not self.last_bullet_time or cur_time - self.last_bullet_time > SHOOTING_RECOIL_TIME:
+        if not self.last_bullet_time or (
+                cur_time - self.last_bullet_time > PLAYER_SHOOTING_RECOIL_TIME):
+
             # play shooting sound effect
             pygame.mixer.Sound.play(PLAYER_SHOOT_SOUND)
 
             self.last_bullet_time = cur_time
 
             # create a bullet object
-            screen_handler.create_bullet(
+            screen_handler.create_player_bullet(
                 self.x, self.y, bullet_speed, bullet_radius, self.window)
 
 
 class Enemy(Character):
+    """Trivial class for all enemies to inherit from."""
+    pass
+
+
+class StandardEnemy(Enemy):
 
     color: tuple = YELLOW
     label: str = 'X'
     label_rgb: tuple = BLACK
+    point_value = config['enemy']['standard_point_value']
 
     def update_state(self, screen_handler):
         pass
+
+
+class ShootingEnemy(Enemy):
+
+    color: tuple = GREEN
+    label: str = 'X'
+    label_rgb: tuple = BLACK
+    point_value = config['enemy']['shooter_point_value']
+    shooting_freq = config['enemy']['shooting_frequency']
+
+    def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
+        self.last_bullet_time = time.time()
+        super().__init__(x, y, vel, radius, window, id)
+
+    def update_state(self, screen_handler):
+        cur_time = time.time()
+        if cur_time - self.last_bullet_time > ENEMY_SHOOTING_RECOIL_TIME:
+            if random.random() < self.shooting_freq:
+                self.shoot(screen_handler)
+            self.last_bullet_time = cur_time
+
+    def shoot(self, screen_handler):
+        # TODO - move this into init?
+        bullet_speed = config['enemy']['bullet']['speed']
+        bullet_radius = config['enemy']['bullet']['radius']
+
+        # play shooting sound effect
+        pygame.mixer.Sound.play(ENEMY_SHOOT_SOUND)
+
+        # create a bullet object
+        screen_handler.create_enemy_bullet(
+            self.x, self.y, bullet_speed, bullet_radius, self.window)
 
 
 class PlayerBullet(Character):
@@ -149,6 +190,31 @@ class PlayerBullet(Character):
 
     def update_state(self, screen_handler):
         self.y -= self.vel
+
+    def is_offscreen(self):
+        max_y = self.window.get_height(
+        ) - config['window']['bottom_vertical_buffer']
+        min_y = config['window']['top_vertical_buffer']
+
+        max_x = self.window.get_width(
+        ) - config['window']['right_horizontal_buffer']
+        min_x = config['window']['left_horizontal_buffer']
+
+        if self.y > max_y or self.y < min_y:
+            return True
+        if self.x > max_x or self.x < min_x:
+            return True
+        return False
+
+
+class EnemyBullet(Character):
+
+    color: tuple = WHITE
+    label: str = ''
+    label_rgb: tuple = BLACK
+
+    def update_state(self, screen_handler):
+        self.y += self.vel
 
     def is_offscreen(self):
         max_y = self.window.get_height(
