@@ -172,21 +172,15 @@ class ScoreBox(ScreenObject):
         self.y = y
 
     def update_state(self, screen_handler):
-        # have screen_handler have access to the score?
-        # whether as a direct attribute or through an attribute
-        # which is a class for game meta information.
-        # Then this method can update the text?
-        # or just have it print the score in the draw method?
-        pass
+        self.score = screen_handler.game_meta.points
+        self.lives = screen_handler.game_meta.lives
 
     def draw(self):
-        score = 10
-        lives = 3
         score_box = pygame.font.SysFont(self.font, self.size).render(
-            f"Score: {score}", True, self.color
+            f"Score: {self.score}", True, self.color
         )
         lives_box = pygame.font.SysFont(self.font, self.size).render(
-            f"Lives: {lives}", True, self.color
+            f"Lives: {self.lives}", True, self.color
         )
         self.window.blit(score_box, (self.x, self.y))
         self.window.blit(lives_box, (self.x, self.y + self.size))

@@ -2,6 +2,9 @@ import math
 
 import pygame
 
+
+from config import get_config
+from src.game_meta import GameMeta
 from src.screen_objects import (
     Player,
     Bullet,
@@ -11,6 +14,7 @@ from src.screen_objects import (
     BLACK,
 )
 
+config = get_config()
 BG_COLOR = BLACK
 
 
@@ -19,6 +23,7 @@ class ScreenHandler:
         self.screen_objects = []
         self.screen_object_factory = ScreenObjectFactory()
         self.screen = screen
+        self.game_meta = GameMeta()
 
     def update_screen_state(self):
         self.cleanup_off_screen_objects()
@@ -56,6 +61,9 @@ class ScreenHandler:
                 if dist <= enemy.radius + bullet.radius:
                     self.remove_screen_object(enemy)
                     self.remove_screen_object(bullet)
+                    self.game_meta.increase_points(
+                        config['enemy']['point_value']
+                    )
 
     def register_screen_object(self, object):
         self.screen_objects.append(object)
