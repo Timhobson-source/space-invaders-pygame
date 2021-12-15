@@ -8,7 +8,8 @@ def clip_value(value, min, max):
 
 
 def generate_enemy_grid(screen_handler, nrows=4, ncols=10):
-    # NOTE - this is pretty confusing/bad code, needs a refactor
+    # NOTE - this is pretty bad/confusing code, needs a refactor
+    # potentially even move this somewhere else
     from config import get_config
     config = get_config()
     r = config['enemy']['radius']
