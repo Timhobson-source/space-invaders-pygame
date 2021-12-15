@@ -15,7 +15,7 @@ if __name__ == '__main__':
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Game!")
 
-    player = Player(250, 250, 25, 15, window)
+    player = Player(250, window.get_height() - 15, 25, 15, window)
     enemy = Enemy(100, 200, 25, 10, window)
     screen_objects = [player, enemy]
 

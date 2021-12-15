@@ -63,10 +63,11 @@ class Player(ScreenObject):
             self.x -= self.vel
         if keys[pygame.K_RIGHT]:
             self.x += self.vel
-        if keys[pygame.K_UP]:
-            self.y -= self.vel
-        if keys[pygame.K_DOWN]:
-            self.y += self.vel
+        # remove x move for now
+        # if keys[pygame.K_UP]:
+        #     self.y -= self.vel
+        # if keys[pygame.K_DOWN]:
+        #     self.y += self.vel
         if keys[pygame.K_SPACE]:
             self.shoot(screen_handler)
 
@@ -109,7 +110,9 @@ class Bullet(ScreenObject):
         self.y -= self.vel
 
     def is_offscreen(self):
-        if self.y > self.window.get_height() or self.y < 0:
+        # add a buffer on top of screen for bullets to disappear
+        # as it looks nicer
+        if self.y > self.window.get_height() or self.y < 50:
             return True
         if self.x > self.window.get_width() or self.x < 0:
             return True
