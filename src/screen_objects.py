@@ -15,13 +15,24 @@ PURPLE = (102, 0, 102)
 SHOOTING_RECOIL_TIME = 0.3  # seconds
 
 
+class ScreenObjectFactory:
+    def __init__(self):
+        self.id_counter = 0
+
+    def create(self, screen_object_cls, *args, **kwargs):
+        self.id_counter += 1
+        return screen_object_cls(*args, id=self.id_counter, **kwargs)
+
+
 class ScreenObject(ABC):
+    """Do not instantiate directly. Use the ScreenObjectFactory class."""
 
     label: str = None
     label_rgb: tuple = None
     color: tuple = None
 
-    def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
+    def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
+        self._id = id
         self.x = x
         self.y = y
         self.vel = vel
@@ -45,6 +56,12 @@ class ScreenObject(ABC):
                            (self.x, self.y), self.radius)
         self.window.blit(self.text, text_coords)
 
+    def id(self):
+        return self._id
+
+    def __eq__(self, obj):
+        return super().__eq__(obj) and obj.id == self.id
+
 
 class Player(ScreenObject):
 
@@ -52,9 +69,9 @@ class Player(ScreenObject):
     label: str = 'player'
     label_rgb: tuple = WHITE
 
-    def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
+    def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
         self.last_bullet_time = None
-        super().__init__(x, y, vel, radius, window)
+        super().__init__(x, y, vel, radius, window, id)
 
     def update_state(self, screen_handler):
         keys = pygame.key.get_pressed()
@@ -63,7 +80,7 @@ class Player(ScreenObject):
             self.x -= self.vel
         if keys[pygame.K_RIGHT]:
             self.x += self.vel
-        # remove x move for now
+        # remove y move for now
         # if keys[pygame.K_UP]:
         #     self.y -= self.vel
         # if keys[pygame.K_DOWN]:
@@ -83,11 +100,8 @@ class Player(ScreenObject):
             self.last_bullet_time = cur_time
 
             # create a bullet object
-            bullet = Bullet(self.x, self.y, vel=bullet_speed,
-                            radius=bullet_radius, window=self.window)
-
-            # let screen handler know about bullet object
-            screen_handler.register_screen_object(bullet)
+            screen_handler.create_bullet(
+                self.x, self.y, bullet_speed, bullet_radius, self.window)
 
 
 class Enemy(ScreenObject):

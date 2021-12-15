@@ -1,7 +1,6 @@
 import pygame
 
 from src.screen import ScreenHandler
-from src.screen_objects import Enemy, Player
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 500, 500
 BLACK = (0, 0, 0)
@@ -15,11 +14,9 @@ if __name__ == '__main__':
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Game!")
 
-    player = Player(250, window.get_height() - 15, 25, 15, window)
-    enemy = Enemy(100, 200, 25, 10, window)
-    screen_objects = [player, enemy]
-
-    screen_handler = ScreenHandler(window, screen_objects)
+    screen_handler = ScreenHandler(window)
+    screen_handler.create_player(250, window.get_height() - 15, 25, 15, window)
+    screen_handler.create_enemy(100, 200, 25, 10, window)
 
     running = True
     while running:
