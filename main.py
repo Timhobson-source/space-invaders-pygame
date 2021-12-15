@@ -3,8 +3,6 @@ import pygame
 from config import get_config
 from src.screen import ScreenHandler
 
-WINDOW_WIDTH, WINDOW_HEIGHT = 500, 500
-
 
 if __name__ == '__main__':
     pygame.init()
