@@ -3,7 +3,10 @@ import time
 
 import pygame
 
+from config import get_config
 from src.helpers import clip_value
+
+config = get_config()
 
 # Colours in RGB format
 BLACK = (0, 0, 0)
@@ -13,6 +16,8 @@ YELLOW = (255, 255, 0)
 PURPLE = (102, 0, 102)
 
 SHOOTING_RECOIL_TIME = 0.3  # seconds
+
+DEFAULT_FONT = pygame.font.get_default_font()
 
 
 class ScreenObjectFactory:
@@ -25,21 +30,37 @@ class ScreenObjectFactory:
 
 
 class ScreenObject(ABC):
-    """Do not instantiate directly. Use the ScreenObjectFactory class."""
+
+    def __init__(self, id):
+        self._id = id
+
+    @property
+    def id(self):
+        return self._id
+
+    def __eq__(self, obj):
+        return super().__eq__(obj) and (obj.id == self.id)
+
+    @abstractmethod
+    def update_state(self, screen_handler):
+        pass
+
+
+class Character(ScreenObject):
+    """Do not instantiate child classes directly. Use the ScreenObjectFactory class."""
 
     label: str = None
     label_rgb: tuple = None
     color: tuple = None
 
     def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
-        self._id = id
+        super().__init__(id)
         self.x = x
         self.y = y
         self.vel = vel
         self.radius = radius
         self.window = window
-        font = pygame.font.get_default_font()
-        self.text = pygame.font.SysFont(font, 20).render(
+        self.text = pygame.font.SysFont(DEFAULT_FONT, 20).render(
             self.label, True, self.label_rgb
         )
 
@@ -56,14 +77,8 @@ class ScreenObject(ABC):
                            (self.x, self.y), self.radius)
         self.window.blit(self.text, text_coords)
 
-    def id(self):
-        return self._id
 
-    def __eq__(self, obj):
-        return super().__eq__(obj) and obj.id == self.id
-
-
-class Player(ScreenObject):
+class Player(Character):
 
     color: tuple = RED
     label: str = 'player'
@@ -89,12 +104,17 @@ class Player(ScreenObject):
             self.shoot(screen_handler)
 
         # stop circle going out of the screen
-        self.x = clip_value(self.x, self.radius,
-                            self.window.get_width() - self.radius)
-        self.y = clip_value(self.y, self.radius,
-                            self.window.get_height() - self.radius)
+        min_x = self.radius + config['window']['left_horizontal_buffer']
+        max_x = self.window.get_width() - self.radius - \
+            config['window']['right_horizontal_buffer']
+        self.x = clip_value(self.x, min_x, max_x)
 
-    def shoot(self, screen_handler, bullet_speed=20, bullet_radius=5):
+    def shoot(self, screen_handler, bullet_speed=None, bullet_radius=None):
+        if bullet_speed is None:
+            bullet_speed = config['bullet']['speed']
+        if bullet_radius is None:
+            bullet_radius = config['bullet']['radius']
+
         cur_time = time.time()
         if not self.last_bullet_time or cur_time - self.last_bullet_time > SHOOTING_RECOIL_TIME:
             self.last_bullet_time = cur_time
@@ -104,7 +124,7 @@ class Player(ScreenObject):
                 self.x, self.y, bullet_speed, bullet_radius, self.window)
 
 
-class Enemy(ScreenObject):
+class Enemy(Character):
 
     color: tuple = YELLOW
     label: str = 'X'
@@ -114,7 +134,7 @@ class Enemy(ScreenObject):
         pass
 
 
-class Bullet(ScreenObject):
+class Bullet(Character):
 
     color: tuple = PURPLE
     label: str = ''
@@ -124,10 +144,49 @@ class Bullet(ScreenObject):
         self.y -= self.vel
 
     def is_offscreen(self):
-        # add a buffer on top of screen for bullets to disappear
-        # as it looks nicer
-        if self.y > self.window.get_height() or self.y < 50:
+        max_y = self.window.get_height(
+        ) - config['window']['bottom_vertical_buffer']
+        min_y = config['window']['top_vertical_buffer']
+
+        max_x = self.window.get_width(
+        ) - config['window']['right_horizontal_buffer']
+        min_x = config['window']['left_horizontal_buffer']
+
+        if self.y > max_y or self.y < min_y:
             return True
-        if self.x > self.window.get_width() or self.x < 0:
+        if self.x > max_x or self.x < min_x:
             return True
         return False
+
+
+class ScoreBox(ScreenObject):
+
+    font = DEFAULT_FONT
+    size = 25
+    color = WHITE
+
+    def __init__(self, x: int, y: int, window: pygame.Surface, id: int):
+        super().__init__(id)
+        self.window = window
+        self.x = x
+        self.y = y
+
+    def update_state(self, screen_handler):
+        # have screen_handler have access to the score?
+        # whether as a direct attribute or through an attribute
+        # which is a class for game meta information.
+        # Then this method can update the text?
+        # or just have it print the score in the draw method?
+        pass
+
+    def draw(self):
+        score = 10
+        lives = 3
+        score_box = pygame.font.SysFont(self.font, self.size).render(
+            f"Score: {score}", True, self.color
+        )
+        lives_box = pygame.font.SysFont(self.font, self.size).render(
+            f"Lives: {lives}", True, self.color
+        )
+        self.window.blit(score_box, (self.x, self.y))
+        self.window.blit(lives_box, (self.x, self.y + self.size))

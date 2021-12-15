@@ -6,6 +6,7 @@ from src.screen_objects import (
     Player,
     Bullet,
     Enemy,
+    ScoreBox,
     ScreenObjectFactory,
     BLACK,
 )
@@ -75,4 +76,9 @@ class ScreenHandler:
     def create_bullet(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface):
         args = [x, y, vel, radius, window]
         obj = self.screen_object_factory.create(Bullet, *args)
+        self.screen_objects.append(obj)
+
+    def create_score_box(self, x: int, y: int, window: pygame.Surface):
+        args = [x, y, window]
+        obj = self.screen_object_factory.create(ScoreBox, *args)
         self.screen_objects.append(obj)
