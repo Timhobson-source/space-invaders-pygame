@@ -1,4 +1,5 @@
 
+
 def clip_value(value, min, max):
     if value < min:
         return min
@@ -30,3 +31,13 @@ def generate_enemy_grid(screen_handler, nrows=4, ncols=10):
                 screen_handler.create_shooting_enemy(x, y, vel, r)
             else:
                 screen_handler.create_standard_enemy(x, y, vel, r)
+
+
+# @lru_cache(maxsize=10)
+def get_lead_enemy(direction, enemies):
+    if direction > 0:
+        max_x = max([e.x for e in enemies])
+        return [e for e in enemies if e.x == max_x][0]
+    elif direction < 0:
+        min_x = min([e.x for e in enemies])
+        return [e for e in enemies if e.x == min_x][0]

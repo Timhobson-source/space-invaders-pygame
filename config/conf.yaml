@@ -15,7 +15,7 @@ enemy:
   standard_point_value: 10
   shooter_point_value: 20
   shooting_frequency: 0.2
-  speed: 5
+  speed: 2
   radius: 10
   bullet:
     speed: 10

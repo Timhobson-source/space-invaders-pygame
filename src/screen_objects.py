@@ -5,7 +5,7 @@ import random
 import pygame
 
 from config import get_config
-from src.helpers import clip_value
+from src.helpers import clip_value, get_lead_enemy
 
 config = get_config()
 
@@ -53,6 +53,12 @@ class ScreenObject(ABC):
 
     def __eq__(self, obj):
         return super().__eq__(obj) and (obj.id == self.id)
+
+    # def __le__(self, obj):
+    #     return super().__le__(obj) and (obj.id <= self.id)
+
+    # def __ge__(self, obj):
+    #     return super().__le__(obj) and (obj.id >= self.id)
 
     @abstractmethod
     def update_state(self, screen_handler):
@@ -138,7 +144,32 @@ class Player(Character):
 
 class Enemy(Character):
     """Trivial class for all enemies to inherit from."""
-    pass
+
+    def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
+        self.direction = 1
+        self.lead_enemy = None
+        super().__init__(x, y, vel, radius, window, id)
+
+    def update_state(self, screen_handler):
+        enemies = [
+            e for e in screen_handler.screen_objects if isinstance(e, Enemy)
+        ]
+        enemies = sorted(enemies, key=lambda x: x.id)
+        lead_enemy = get_lead_enemy(self.direction, enemies)
+        del enemies  # avoid memory leak
+
+        max_x = screen_handler.screen.get_width(
+        ) - config['window']['right_horizontal_buffer'] - lead_enemy.radius
+        min_x = config['window']['left_horizontal_buffer'] + lead_enemy.radius
+
+        if self.direction > 0 and lead_enemy.x > max_x:
+            self.direction = -1  # switch direction
+            self.y += 4 * self.vel  # move downwards
+        elif self.direction < 0 and lead_enemy.x < min_x:
+            self.direction = 1  # switch direction
+            self.y += 4 * self.vel  # move downwards
+
+        self.x += self.direction * self.vel
 
 
 class StandardEnemy(Enemy):
@@ -147,9 +178,6 @@ class StandardEnemy(Enemy):
     label: str = 'X'
     label_rgb: tuple = BLACK
     point_value = config['enemy']['standard_point_value']
-
-    def update_state(self, screen_handler):
-        pass
 
 
 class ShootingEnemy(Enemy):
@@ -165,6 +193,7 @@ class ShootingEnemy(Enemy):
         super().__init__(x, y, vel, radius, window, id)
 
     def update_state(self, screen_handler):
+        super().update_state(screen_handler)
         cur_time = time.time()
         if cur_time - self.last_bullet_time > ENEMY_SHOOTING_RECOIL_TIME:
             if random.random() < self.shooting_freq:
