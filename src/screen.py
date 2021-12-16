@@ -21,14 +21,19 @@ EXPLOSION_SOUND = pygame.mixer.Sound('data/sounds/explosion.wav')
 class ScreenHandler:
     def __init__(self, screen: pygame.Surface):
         self.screen_objects = []
+        self.formations = []
         self.screen_object_factory = ScreenObjectFactory(self)
         self.screen = screen
         self.game_meta = GameMeta()
 
     def update_screen_state(self):
-        self.handle_player_and_enemy_bullet_collisions()
         self.cleanup_off_screen_objects()
-        self.cleanup_destroyed_enemies()
+        self.handle_player_and_enemy_bullet_collisions()
+        self.handle_enemy_and_player_bullet_collisions()
+
+        for formation in self.formations:
+            formation.update_state()
+
         self.screen.fill(BG_COLOR)
         for object in self.screen_objects:
             object.update_state(self)
@@ -43,7 +48,7 @@ class ScreenHandler:
         for object in offscreen_objects:
             self.remove_screen_object(object)
 
-    def cleanup_destroyed_enemies(self):
+    def handle_enemy_and_player_bullet_collisions(self):
         bullets = [
             obj for obj in self.screen_objects if isinstance(obj, PlayerBullet)]
         enemies = [
@@ -92,3 +97,9 @@ class ScreenHandler:
 
     def remove_screen_object(self, object):
         self.screen_objects.remove(object)
+
+    def register_formation(self, formation):
+        self.formations.append(formation)
+
+    def remove_formation(self, formation):
+        self.formations.remove(formation)

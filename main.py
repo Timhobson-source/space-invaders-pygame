@@ -2,7 +2,7 @@ import pygame
 
 from config import get_config
 from src.screen import ScreenHandler
-from src.helpers import generate_enemy_grid
+from src.formations import build_formation
 
 
 if __name__ == '__main__':
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     screen_handler.screen_object_factory.create_score_box(**config['scorebox'])
     screen_handler.screen_object_factory.create_player(250, window.get_height(
     ) - 15 - config['window']['bottom_vertical_buffer'], 25, 15)
-    generate_enemy_grid(screen_handler)
+    build_formation(screen_handler)
 
     running = True
     while running:
