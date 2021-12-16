@@ -1,17 +1,13 @@
-import math
-
 import pygame
 
 from config import get_config
 from src.game_meta import GameMeta
+from src.helpers import detect_collision
 from src.screen_objects import (
     Player,
     PlayerBullet,
     EnemyBullet,
     Enemy,
-    ShootingEnemy,
-    StandardEnemy,
-    ScoreBox,
     ScreenObjectFactory,
     BLACK,
 )
@@ -25,12 +21,12 @@ EXPLOSION_SOUND = pygame.mixer.Sound('data/sounds/explosion.wav')
 class ScreenHandler:
     def __init__(self, screen: pygame.Surface):
         self.screen_objects = []
-        self.screen_object_factory = ScreenObjectFactory()
+        self.screen_object_factory = ScreenObjectFactory(self)
         self.screen = screen
         self.game_meta = GameMeta()
 
     def update_screen_state(self):
-        self.handle_player_enemy_bullet_collisions()
+        self.handle_player_and_enemy_bullet_collisions()
         self.cleanup_off_screen_objects()
         self.cleanup_destroyed_enemies()
         self.screen.fill(BG_COLOR)
@@ -59,11 +55,7 @@ class ScreenHandler:
             # find any bullet closer to centre than radius
             # and remove bullet and enemy from screen
             for bullet in bullets:
-                dist = math.sqrt(
-                    (enemy.x - bullet.x)**2 +
-                    (enemy.y - bullet.y)**2
-                )
-                if dist <= enemy.radius + bullet.radius:
+                if detect_collision(enemy, bullet):
                     # play explosion sound for collision
                     pygame.mixer.Sound.play(EXPLOSION_SOUND)
 
@@ -74,7 +66,7 @@ class ScreenHandler:
                         enemy.point_value
                     )
 
-    def handle_player_enemy_bullet_collisions(self):
+    def handle_player_and_enemy_bullet_collisions(self):
         enemy_bullets = [
             obj for obj in self.screen_objects if isinstance(obj, EnemyBullet)]
 
@@ -85,10 +77,7 @@ class ScreenHandler:
 
         for player in players:
             for bullet in enemy_bullets:
-                dist = math.sqrt(
-                    (player.x - bullet.x)**2 + (player.y - bullet.y)**2
-                )
-                if dist < player.radius + bullet.radius:
+                if detect_collision(player, bullet):
                     # more logic here needed if we add multiplayer
                     # as well as in GameMeta object.
                     # IDEA: use a dict of player -> lives/points mapping?
@@ -103,33 +92,3 @@ class ScreenHandler:
 
     def remove_screen_object(self, object):
         self.screen_objects.remove(object)
-
-    def create_player(self, x: int, y: int, vel: int, radius: int):
-        args = [x, y, vel, radius, self.screen]
-        obj = self.screen_object_factory.create(Player, *args)
-        self.screen_objects.append(obj)
-
-    def create_standard_enemy(self, x: int, y: int, vel: int, radius: int):
-        args = [x, y, vel, radius, self.screen]
-        obj = self.screen_object_factory.create(StandardEnemy, *args)
-        self.screen_objects.append(obj)
-
-    def create_shooting_enemy(self, x: int, y: int, vel: int, radius: int):
-        args = [x, y, vel, radius, self.screen]
-        obj = self.screen_object_factory.create(ShootingEnemy, *args)
-        self.screen_objects.append(obj)
-
-    def create_player_bullet(self, x: int, y: int, vel: int, radius: int):
-        args = [x, y, vel, radius, self.screen]
-        obj = self.screen_object_factory.create(PlayerBullet, *args)
-        self.screen_objects.append(obj)
-
-    def create_enemy_bullet(self, x: int, y: int, vel: int, radius: int):
-        args = [x, y, vel, radius, self.screen]
-        obj = self.screen_object_factory.create(EnemyBullet, *args)
-        self.screen_objects.append(obj)
-
-    def create_score_box(self, x: int, y: int):
-        args = [x, y, self.screen]
-        obj = self.screen_object_factory.create(ScoreBox, *args)
-        self.screen_objects.append(obj)

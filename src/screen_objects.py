@@ -34,12 +34,43 @@ ENEMY_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
 
 
 class ScreenObjectFactory:
-    def __init__(self):
+    def __init__(self, screen_handler):
+        self.screen_handler = screen_handler
         self.id_counter = 0
 
     def create(self, screen_object_cls, *args, **kwargs):
         self.id_counter += 1
         return screen_object_cls(*args, id=self.id_counter, **kwargs)
+
+    def create_player(self, x: int, y: int, vel: int, radius: int):
+        args = [x, y, vel, radius, self.screen_handler.screen]
+        obj = self.create(Player, *args)
+        self.screen_handler.screen_objects.append(obj)
+
+    def create_standard_enemy(self, x: int, y: int, vel: int, radius: int):
+        args = [x, y, vel, radius, self.screen_handler.screen]
+        obj = self.create(StandardEnemy, *args)
+        self.screen_handler.screen_objects.append(obj)
+
+    def create_shooting_enemy(self, x: int, y: int, vel: int, radius: int):
+        args = [x, y, vel, radius, self.screen_handler.screen]
+        obj = self.create(ShootingEnemy, *args)
+        self.screen_handler.screen_objects.append(obj)
+
+    def create_player_bullet(self, x: int, y: int, vel: int, radius: int):
+        args = [x, y, vel, radius, self.screen_handler.screen]
+        obj = self.create(PlayerBullet, *args)
+        self.screen_handler.screen_objects.append(obj)
+
+    def create_enemy_bullet(self, x: int, y: int, vel: int, radius: int):
+        args = [x, y, vel, radius, self.screen_handler.screen]
+        obj = self.create(EnemyBullet, *args)
+        self.screen_handler.screen_objects.append(obj)
+
+    def create_score_box(self, x: int, y: int):
+        args = [x, y, self.screen_handler.screen]
+        obj = self.create(ScoreBox, *args)
+        self.screen_handler.screen_objects.append(obj)
 
 
 class ScreenObject(ABC):
@@ -53,12 +84,6 @@ class ScreenObject(ABC):
 
     def __eq__(self, obj):
         return super().__eq__(obj) and (obj.id == self.id)
-
-    # def __le__(self, obj):
-    #     return super().__le__(obj) and (obj.id <= self.id)
-
-    # def __ge__(self, obj):
-    #     return super().__le__(obj) and (obj.id >= self.id)
 
     @abstractmethod
     def update_state(self, screen_handler):
@@ -95,6 +120,21 @@ class Character(ScreenObject):
         pygame.draw.circle(self.window, self.color,
                            (self.x, self.y), self.radius)
         self.window.blit(self.text, text_coords)
+
+    def is_offscreen(self):
+        max_y = self.window.get_height(
+        ) - config['window']['bottom_vertical_buffer']
+        min_y = config['window']['top_vertical_buffer']
+
+        max_x = self.window.get_width(
+        ) - config['window']['right_horizontal_buffer']
+        min_x = config['window']['left_horizontal_buffer']
+
+        if self.y > max_y or self.y < min_y:
+            return True
+        if self.x > max_x or self.x < min_x:
+            return True
+        return False
 
 
 class Player(Character):
@@ -138,7 +178,7 @@ class Player(Character):
             self.last_bullet_time = cur_time
 
             # create a bullet object
-            screen_handler.create_player_bullet(
+            screen_handler.screen_object_factory.create_player_bullet(
                 self.x, self.y, bullet_speed, bullet_radius)
 
 
@@ -154,7 +194,6 @@ class Enemy(Character):
         enemies = [
             e for e in screen_handler.screen_objects if isinstance(e, Enemy)
         ]
-        enemies = sorted(enemies, key=lambda x: x.id)
         lead_enemy = get_lead_enemy(self.direction, enemies)
         del enemies  # avoid memory leak
 
@@ -209,7 +248,7 @@ class ShootingEnemy(Enemy):
         pygame.mixer.Sound.play(ENEMY_SHOOT_SOUND)
 
         # create a bullet object
-        screen_handler.create_enemy_bullet(
+        screen_handler.screen_object_factory.create_enemy_bullet(
             self.x, self.y, bullet_speed, bullet_radius)
 
 
@@ -222,21 +261,6 @@ class PlayerBullet(Character):
     def update_state(self, screen_handler):
         self.y -= self.vel
 
-    def is_offscreen(self):
-        max_y = self.window.get_height(
-        ) - config['window']['bottom_vertical_buffer']
-        min_y = config['window']['top_vertical_buffer']
-
-        max_x = self.window.get_width(
-        ) - config['window']['right_horizontal_buffer']
-        min_x = config['window']['left_horizontal_buffer']
-
-        if self.y > max_y or self.y < min_y:
-            return True
-        if self.x > max_x or self.x < min_x:
-            return True
-        return False
-
 
 class EnemyBullet(Character):
 
@@ -246,21 +270,6 @@ class EnemyBullet(Character):
 
     def update_state(self, screen_handler):
         self.y += self.vel
-
-    def is_offscreen(self):
-        max_y = self.window.get_height(
-        ) - config['window']['bottom_vertical_buffer']
-        min_y = config['window']['top_vertical_buffer']
-
-        max_x = self.window.get_width(
-        ) - config['window']['right_horizontal_buffer']
-        min_x = config['window']['left_horizontal_buffer']
-
-        if self.y > max_y or self.y < min_y:
-            return True
-        if self.x > max_x or self.x < min_x:
-            return True
-        return False
 
 
 class ScoreBox(ScreenObject):
