@@ -8,14 +8,15 @@ window:
 
 player:
   bullet:
-    speed: 25
-    radius: 5
+    speed: 20
+    radius: 3
+    recoil: 0.6
 
 enemy:
   standard_point_value: 10
   shooter_point_value: 20
   shooting_frequency: 0.2
-  speed: 2
+  speed: 5
   radius: 10
   bullet:
     speed: 10

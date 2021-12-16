@@ -20,7 +20,7 @@ YELLOW = (255, 255, 0)
 PURPLE = (102, 0, 102)
 GREEN = (0, 255, 0)
 
-PLAYER_SHOOTING_RECOIL_TIME = 0.3  # seconds
+PLAYER_SHOOTING_RECOIL_TIME = config['player']['bullet']['recoil']  # seconds
 ENEMY_SHOOTING_RECOIL_TIME = 3  # seconds
 # TODO - ^Make this variable for different levels of difficulty
 
