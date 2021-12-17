@@ -1,10 +1,10 @@
 window:
   width: 500
   height: 500
-  left_horizontal_buffer: 25
-  right_horizontal_buffer: 25
-  top_vertical_buffer: 70
-  bottom_vertical_buffer: 0
+  left_buffer: 25
+  right_buffer: 25
+  top_buffer: 70
+  bottom_buffer: 10
 
 player:
   bullet:

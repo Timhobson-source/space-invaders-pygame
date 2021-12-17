@@ -46,37 +46,43 @@ class ScreenObjectFactory:
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(Player, *args)
         self.screen_handler.register_screen_object(obj)
+        return obj
 
     def create_standard_enemy(self, x: int, y: int, vel: int, radius: int):
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(StandardEnemy, *args)
         self.screen_handler.register_screen_object(obj)
+        return obj
 
     def create_shooting_enemy(self, x: int, y: int, vel: int, radius: int):
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(ShootingEnemy, *args)
         self.screen_handler.register_screen_object(obj)
+        return obj
 
     def create_player_bullet(self, x: int, y: int, vel: int, radius: int):
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(PlayerBullet, *args)
         self.screen_handler.register_screen_object(obj)
+        return obj
 
     def create_enemy_bullet(self, x: int, y: int, vel: int, radius: int):
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(EnemyBullet, *args)
         self.screen_handler.register_screen_object(obj)
+        return obj
 
     def create_score_box(self, x: int, y: int):
         args = [x, y, self.screen_handler.screen]
         obj = self.create(ScoreBox, *args)
         self.screen_handler.register_screen_object(obj)
+        return obj
 
-    def create_lost_game_box(self, x: int, y: int):
-        args = [x, y, self.screen_handler.screen]
-        obj = self.create(LostGameBox, *args)
+    def create_end_game_box(self, x: int, y: int, message: str):
+        args = [x, y, message, self.screen_handler.screen]
+        obj = self.create(EndGameBox, *args)
         self.screen_handler.register_screen_object(obj)
-        return obj  # we should make this consistent
+        return obj
 
 
 class ScreenObject(ABC):
@@ -129,12 +135,12 @@ class Character(ScreenObject):
 
     def is_offscreen(self):
         max_y = self.window.get_height(
-        ) - config['window']['bottom_vertical_buffer']
-        min_y = config['window']['top_vertical_buffer']
+        ) - config['window']['bottom_buffer']
+        min_y = config['window']['top_buffer']
 
         max_x = self.window.get_width(
-        ) - config['window']['right_horizontal_buffer']
-        min_x = config['window']['left_horizontal_buffer']
+        ) - config['window']['right_buffer']
+        min_x = config['window']['left_buffer']
 
         if self.y > max_y or self.y < min_y:
             return True
@@ -164,9 +170,9 @@ class Player(Character):
             self.shoot(screen_handler)
 
         # stop circle going out of the screen
-        min_x = self.radius + config['window']['left_horizontal_buffer']
+        min_x = self.radius + config['window']['left_buffer']
         max_x = self.window.get_width() - self.radius - \
-            config['window']['right_horizontal_buffer']
+            config['window']['right_buffer']
         self.x = clip_value(self.x, min_x, max_x)
 
     def shoot(self, screen_handler):
@@ -204,8 +210,8 @@ class Enemy(Character):
         del enemies  # avoid memory leak
 
         max_x = screen_handler.screen.get_width(
-        ) - config['window']['right_horizontal_buffer'] - lead_enemy.radius
-        min_x = config['window']['left_horizontal_buffer'] + lead_enemy.radius
+        ) - config['window']['right_buffer'] - lead_enemy.radius
+        min_x = config['window']['left_buffer'] + lead_enemy.radius
 
         if self.direction > 0 and lead_enemy.x > max_x:
             self.direction = -1  # switch direction
@@ -305,16 +311,17 @@ class ScoreBox(ScreenObject):
         self.window.blit(lives_box, (self.x, self.y + self.size))
 
 
-class LostGameBox(ScreenObject):
+class EndGameBox(ScreenObject):
 
     font = DEFAULT_FONT
     color = WHITE
 
-    def __init__(self, x: int, y: int, window: pygame.Surface, id: int):
+    def __init__(self, x: int, y: int, message: str, window: pygame.Surface, id: int):
         super().__init__(id)
         self.window = window
         self.x = x
         self.y = y
+        self.message = message
 
     def update_state(self, screen_handler):
         pass
@@ -323,7 +330,7 @@ class LostGameBox(ScreenObject):
         msg_size = 50
         score_box_size = 25
         msg = pygame.font.SysFont(self.font, msg_size).render(
-            "GAME OVER", True, self.color
+            self.message, True, self.color
         )
         score_box = pygame.font.SysFont(self.font, score_box_size).render(
             f"Score: {score}", True, self.color

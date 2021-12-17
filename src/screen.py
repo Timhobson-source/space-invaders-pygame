@@ -27,8 +27,11 @@ class ScreenHandler:
 
     def update_screen_state(self):
         if self.player_has_lost():
-            self.game_meta.stop_game()
+            self.game_meta.set_game_lost()
             self.draw_losing_screen()
+        elif self.player_has_won():
+            self.game_meta.set_game_won()
+            self.draw_winning_screen()
         else:
             self.update_and_draw_objects()
 
@@ -37,14 +40,20 @@ class ScreenHandler:
     def player_has_lost(self):
         if self.game_meta.game_being_played:
             max_y = self.screen.get_height(
-            ) - config['window']['bottom_vertical_buffer']
+            ) - config['window']['bottom_buffer']
             enemies_land = any(
                 [
                     obj for obj in self.screen_objects
                     if isinstance(obj, Enemy) and obj.y >= max_y]
             )
             return (not self.game_meta.player_has_lives) or enemies_land
-        return True
+        return self.game_meta.lost_state
+
+    def player_has_won(self):
+        if self.game_meta.game_being_played:
+            enemies_defeated = not [obj for obj in self.screen_objects if isinstance(obj, Enemy)]
+            return self.game_meta.player_has_lives and enemies_defeated
+        return self.game_meta.won_state
 
     def clear_objects_from_screen(self):
         self.screen_objects = []
@@ -52,7 +61,13 @@ class ScreenHandler:
     def draw_losing_screen(self):
         self.screen.fill(BG_COLOR)
         self.clear_objects_from_screen()
-        box = self.screen_object_factory.create_lost_game_box(150, 200)
+        box = self.screen_object_factory.create_end_game_box(150, 200, 'YOU LOST!')
+        box.draw(self.game_meta.points)
+
+    def draw_winning_screen(self):
+        self.screen.fill(BG_COLOR)
+        self.clear_objects_from_screen()
+        box = self.screen_object_factory.create_end_game_box(150, 200, 'YOU WON!')
         box.draw(self.game_meta.points)
 
     def update_and_draw_objects(self):

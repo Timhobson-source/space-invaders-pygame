@@ -4,6 +4,8 @@ class GameMeta:
         self.lives = start_lives
         self.points = start_points
         self.game_being_played = True
+        self.lost_state = False
+        self.won_state = False
 
     def lose_life(self):
         self.lives -= 1
@@ -17,3 +19,13 @@ class GameMeta:
     def stop_game(self):
         if self.game_being_played:
             self.game_being_played = False
+
+    def set_game_lost(self):
+        self.stop_game()
+        self.lost_state = True
+        self.won_state = False
+
+    def set_game_won(self):
+        self.stop_game()
+        self.lost_state = False
+        self.won_state = True
