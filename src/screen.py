@@ -1,3 +1,5 @@
+import os
+
 import pygame
 
 from config import get_config
@@ -9,11 +11,13 @@ from src.screen_objects import (
     EnemyBullet,
     Enemy,
     ScreenObjectFactory,
-    BLACK,
 )
 
 config = get_config()
-BG_COLOR = BLACK  # TODO - make a more interesting background
+BG = pygame.transform.scale(
+    pygame.image.load(os.path.join('data', 'images', 'background.jpg')),
+    (config['window']['width'], config['window']['height'])
+)
 
 EXPLOSION_SOUND = pygame.mixer.Sound('data/sounds/explosion.wav')
 
@@ -59,7 +63,7 @@ class ScreenHandler:
         self.screen_objects = []
 
     def draw_end_screen(self, msg: str):
-        self.screen.fill(BG_COLOR)
+        self.screen.blit(BG, (0, 0))
         self.clear_objects_from_screen()
         box = self.screen_object_factory.create_end_game_box(150, 200, msg)
         box.draw(self.game_meta.points)
@@ -69,7 +73,7 @@ class ScreenHandler:
         self.handle_player_and_enemy_bullet_collisions()
         self.handle_enemy_and_player_bullet_collisions()
 
-        self.screen.fill(BG_COLOR)
+        self.screen.blit(BG, (0, 0))
         for object in self.screen_objects:
             object.update_state(self)
             object.draw()

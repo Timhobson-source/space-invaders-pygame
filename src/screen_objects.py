@@ -19,6 +19,7 @@ RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 PURPLE = (102, 0, 102)
 GREEN = (0, 255, 0)
+PINK = (220, 20, 60)
 
 PLAYER_SHOOTING_RECOIL_TIME = config['player']['bullet']['recoil']  # seconds
 ENEMY_SHOOTING_RECOIL_TIME = config['enemy']['bullet']['recoil']  # seconds
@@ -269,7 +270,7 @@ class ShootingEnemy(Enemy):
 
 class PlayerBullet(Character):
 
-    color: tuple = PURPLE
+    color: tuple = PINK
     label: str = ''
     label_rgb: tuple = BLACK
 
