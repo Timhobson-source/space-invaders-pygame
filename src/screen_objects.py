@@ -33,6 +33,8 @@ pygame.mixer.init()
 PLAYER_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
 ENEMY_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
 
+YELLOW_INVADER = pygame.image.load('data/images/invader-yellow.png')
+
 
 class ScreenObjectFactory:
     def __init__(self, screen_handler):
@@ -231,6 +233,9 @@ class StandardEnemy(Enemy):
     label: str = 'X'
     label_rgb: tuple = BLACK
     point_value = config['enemy']['standard_point_value']
+
+    # def draw(self):
+    #     pygame.draw()
 
 
 class ShootingEnemy(Enemy):
