@@ -20,6 +20,7 @@ BG = pygame.transform.scale(
 )
 
 EXPLOSION_SOUND = pygame.mixer.Sound('data/sounds/explosion.wav')
+HURT_SOUND = pygame.mixer.Sound('data/sounds/beep.wav')
 
 
 class ScreenHandler:
@@ -124,8 +125,8 @@ class ScreenHandler:
         for player in players:
             for bullet in enemy_bullets:
                 if detect_collision(player, bullet):
-                    # TODO - add playing a "losing life" sound here
-                    # and temporary color change for player object
+                    pygame.mixer.Sound.play(HURT_SOUND)
+                    # TODO - add temporary color change for player object
                     self.game_meta.lose_life()
                     self.remove_screen_object(bullet)
 

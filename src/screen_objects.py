@@ -270,7 +270,7 @@ class ShootingEnemy(Enemy):
 
 class PlayerBullet(Character):
 
-    color: tuple = PINK
+    color: tuple = RED
     label: str = ''
     label_rgb: tuple = BLACK
 
