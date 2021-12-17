@@ -46,7 +46,7 @@ class ScreenHandler:
                     obj for obj in self.screen_objects
                     if isinstance(obj, Enemy) and obj.y >= max_y]
             )
-            return (not self.game_meta.player_has_lives) or enemies_land
+            return (not self.game_meta.player_has_lives()) or enemies_land
         return self.game_meta.lost_state
 
     def player_has_won(self):
@@ -93,6 +93,7 @@ class ScreenHandler:
             # get enemy centre and radius
             # find any bullet closer to centre than radius
             # and remove bullet and enemy from screen
+            removed_bullets = []
             for bullet in bullets:
                 if detect_collision(enemy, bullet):
                     # play explosion sound for collision
@@ -100,7 +101,9 @@ class ScreenHandler:
 
                     # remove relevant objects from screen
                     self.remove_screen_object(enemy)
-                    self.remove_screen_object(bullet)
+                    if bullet not in removed_bullets:
+                        self.remove_screen_object(bullet)
+                        removed_bullets.append(bullet)
                     self.game_meta.increase_points(
                         enemy.point_value
                     )

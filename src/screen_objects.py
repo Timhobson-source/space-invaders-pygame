@@ -5,7 +5,7 @@ import random
 import pygame
 
 from config import get_config
-from src.helpers import clip_value, get_lead_enemy
+from src.helpers import clip_value
 
 config = get_config()
 
@@ -21,7 +21,7 @@ PURPLE = (102, 0, 102)
 GREEN = (0, 255, 0)
 
 PLAYER_SHOOTING_RECOIL_TIME = config['player']['bullet']['recoil']  # seconds
-ENEMY_SHOOTING_RECOIL_TIME = 3  # seconds
+ENEMY_SHOOTING_RECOIL_TIME = config['enemy']['bullet']['recoil']  # seconds
 # TODO - ^Make this variable for different levels of difficulty
 
 DEFAULT_FONT = pygame.font.get_default_font()
@@ -167,7 +167,11 @@ class Player(Character):
         if keys[pygame.K_RIGHT]:
             self.x += self.vel
         if keys[pygame.K_SPACE]:
-            self.shoot(screen_handler)
+            already_bullet_on_screen = any(
+                [x for x in screen_handler.screen_objects if isinstance(x, PlayerBullet)]
+            )
+            if not already_bullet_on_screen:
+                self.shoot(screen_handler)
 
         # stop circle going out of the screen
         min_x = self.radius + config['window']['left_buffer']
@@ -199,28 +203,25 @@ class Enemy(Character):
 
     def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
         self.direction = 1
+        self.move_counter = 0
+        self.move_counter_max_level = None
         self.lead_enemy = None
         super().__init__(x, y, vel, radius, window, id)
 
+    def set_move_counter_max_level(self, level: int):
+        self.move_counter_max_level = level
+
     def update_state(self, screen_handler):
-        enemies = [
-            e for e in screen_handler.screen_objects if isinstance(e, Enemy)
-        ]
-        lead_enemy = get_lead_enemy(self.direction, enemies)
-        del enemies  # avoid memory leak
+        if self.move_counter is None:
+            raise ValueError("Move counter level must be set for enemy object post initialisation!")
 
-        max_x = screen_handler.screen.get_width(
-        ) - config['window']['right_buffer'] - lead_enemy.radius
-        min_x = config['window']['left_buffer'] + lead_enemy.radius
-
-        if self.direction > 0 and lead_enemy.x > max_x:
-            self.direction = -1  # switch direction
-            self.y += 4 * self.vel  # move downwards
-        elif self.direction < 0 and lead_enemy.x < min_x:
-            self.direction = 1  # switch direction
-            self.y += 4 * self.vel  # move downwards
-
-        self.x += self.direction * self.vel
+        if self.move_counter == self.move_counter_max_level:
+            self.y += 4 * self.vel  # move down
+            self.direction *= -1  # switch direction
+            self.move_counter = 0  # reset move counter
+        else:
+            self.x += self.direction * self.vel
+            self.move_counter += 1
 
 
 class StandardEnemy(Enemy):
@@ -245,14 +246,16 @@ class ShootingEnemy(Enemy):
 
     def update_state(self, screen_handler):
         super().update_state(screen_handler)
+
+        recoil = ENEMY_SHOOTING_RECOIL_TIME + random.random()
+
         cur_time = time.time()
-        if cur_time - self.last_bullet_time > ENEMY_SHOOTING_RECOIL_TIME:
+        if cur_time - self.last_bullet_time > recoil:
             if random.random() < self.shooting_freq:
                 self.shoot(screen_handler)
             self.last_bullet_time = cur_time
 
     def shoot(self, screen_handler):
-        # TODO - move this into init?
         bullet_speed = config['enemy']['bullet']['speed']
         bullet_radius = config['enemy']['bullet']['radius']
 

@@ -10,7 +10,7 @@ player:
   bullet:
     speed: 20
     radius: 3
-    recoil: 0.6
+    recoil: 0.1
 
 enemy:
   standard_point_value: 10
@@ -21,6 +21,7 @@ enemy:
   bullet:
     speed: 10
     radius: 3
+    recoil: 1.5
 
 scorebox:
   x: 400
