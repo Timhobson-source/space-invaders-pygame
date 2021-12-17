@@ -26,9 +26,10 @@ class ScreenHandler:
         self.game_meta = GameMeta()
 
     def update_screen_state(self):
-        self.handle_player_and_enemy_bullet_collisions()
         self.cleanup_off_screen_objects()
-        self.cleanup_destroyed_enemies()
+        self.handle_player_and_enemy_bullet_collisions()
+        self.handle_enemy_and_player_bullet_collisions()
+
         self.screen.fill(BG_COLOR)
         for object in self.screen_objects:
             object.update_state(self)
@@ -43,7 +44,7 @@ class ScreenHandler:
         for object in offscreen_objects:
             self.remove_screen_object(object)
 
-    def cleanup_destroyed_enemies(self):
+    def handle_enemy_and_player_bullet_collisions(self):
         bullets = [
             obj for obj in self.screen_objects if isinstance(obj, PlayerBullet)]
         enemies = [

@@ -45,32 +45,32 @@ class ScreenObjectFactory:
     def create_player(self, x: int, y: int, vel: int, radius: int):
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(Player, *args)
-        self.screen_handler.screen_objects.append(obj)
+        self.screen_handler.register_screen_object(obj)
 
     def create_standard_enemy(self, x: int, y: int, vel: int, radius: int):
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(StandardEnemy, *args)
-        self.screen_handler.screen_objects.append(obj)
+        self.screen_handler.register_screen_object(obj)
 
     def create_shooting_enemy(self, x: int, y: int, vel: int, radius: int):
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(ShootingEnemy, *args)
-        self.screen_handler.screen_objects.append(obj)
+        self.screen_handler.register_screen_object(obj)
 
     def create_player_bullet(self, x: int, y: int, vel: int, radius: int):
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(PlayerBullet, *args)
-        self.screen_handler.screen_objects.append(obj)
+        self.screen_handler.register_screen_object(obj)
 
     def create_enemy_bullet(self, x: int, y: int, vel: int, radius: int):
         args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(EnemyBullet, *args)
-        self.screen_handler.screen_objects.append(obj)
+        self.screen_handler.register_screen_object(obj)
 
     def create_score_box(self, x: int, y: int):
         args = [x, y, self.screen_handler.screen]
         obj = self.create(ScoreBox, *args)
-        self.screen_handler.screen_objects.append(obj)
+        self.screen_handler.register_screen_object(obj)
 
 
 class ScreenObject(ABC):
