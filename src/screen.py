@@ -28,10 +28,10 @@ class ScreenHandler:
     def update_screen_state(self):
         if self.player_has_lost():
             self.game_meta.set_game_lost()
-            self.draw_losing_screen()
+            self.draw_end_screen('YOU LOST!')
         elif self.player_has_won():
             self.game_meta.set_game_won()
-            self.draw_winning_screen()
+            self.draw_end_screen('YOU WON!')
         else:
             self.update_and_draw_objects()
 
@@ -58,16 +58,10 @@ class ScreenHandler:
     def clear_objects_from_screen(self):
         self.screen_objects = []
 
-    def draw_losing_screen(self):
+    def draw_end_screen(self, msg: str):
         self.screen.fill(BG_COLOR)
         self.clear_objects_from_screen()
-        box = self.screen_object_factory.create_end_game_box(150, 200, 'YOU LOST!')
-        box.draw(self.game_meta.points)
-
-    def draw_winning_screen(self):
-        self.screen.fill(BG_COLOR)
-        self.clear_objects_from_screen()
-        box = self.screen_object_factory.create_end_game_box(150, 200, 'YOU WON!')
+        box = self.screen_object_factory.create_end_game_box(150, 200, msg)
         box.draw(self.game_meta.points)
 
     def update_and_draw_objects(self):
