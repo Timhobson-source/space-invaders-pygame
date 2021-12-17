@@ -21,7 +21,6 @@ EXPLOSION_SOUND = pygame.mixer.Sound('data/sounds/explosion.wav')
 class ScreenHandler:
     def __init__(self, screen: pygame.Surface):
         self.screen_objects = []
-        self.formations = []
         self.screen_object_factory = ScreenObjectFactory(self)
         self.screen = screen
         self.game_meta = GameMeta()
@@ -94,9 +93,3 @@ class ScreenHandler:
 
     def remove_screen_object(self, object):
         self.screen_objects.remove(object)
-
-    def register_formation(self, formation):
-        self.formations.append(formation)
-
-    def remove_formation(self, formation):
-        self.formations.remove(formation)

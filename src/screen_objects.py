@@ -5,7 +5,6 @@ import random
 import pygame
 
 from config import get_config
-from src.formations import Formation
 from src.helpers import clip_value, get_lead_enemy
 
 config = get_config()
@@ -48,13 +47,13 @@ class ScreenObjectFactory:
         obj = self.create(Player, *args)
         self.screen_handler.register_screen_object(obj)
 
-    def create_standard_enemy(self, x: int, y: int, vel: int, radius: int, formation: Formation):
-        args = [x, y, vel, radius, formation, self.screen_handler.screen]
+    def create_standard_enemy(self, x: int, y: int, vel: int, radius: int):
+        args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(StandardEnemy, *args)
         self.screen_handler.register_screen_object(obj)
 
-    def create_shooting_enemy(self, x: int, y: int, vel: int, radius: int, formation: Formation):
-        args = [x, y, vel, radius, formation, self.screen_handler.screen]
+    def create_shooting_enemy(self, x: int, y: int, vel: int, radius: int):
+        args = [x, y, vel, radius, self.screen_handler.screen]
         obj = self.create(ShootingEnemy, *args)
         self.screen_handler.register_screen_object(obj)
 
