@@ -19,10 +19,8 @@ def get_lead_enemy(direction, enemies):
 
 
 def detect_collision(obj1, obj2):
-    dist = math.sqrt(
-        (obj1.x - obj2.x)**2 +
-        (obj1.y - obj2.y)**2
-    )
-    if dist <= obj1.radius + obj2.radius:
-        return True
-    return False
+    return distance_between_objects(obj1, obj2) <= obj1.radius + obj2.radius
+
+
+def distance_between_objects(obj1, obj2):
+    return math.sqrt((obj1.x - obj2.x)**2 + (obj1.y - obj2.y)**2)

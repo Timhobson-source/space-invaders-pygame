@@ -72,6 +72,12 @@ class ScreenObjectFactory:
         obj = self.create(ScoreBox, *args)
         self.screen_handler.register_screen_object(obj)
 
+    def create_lost_game_box(self, x: int, y: int):
+        args = [x, y, self.screen_handler.screen]
+        obj = self.create(LostGameBox, *args)
+        self.screen_handler.register_screen_object(obj)
+        return obj  # we should make this consistent
+
 
 class ScreenObject(ABC):
 
@@ -297,3 +303,35 @@ class ScoreBox(ScreenObject):
         )
         self.window.blit(score_box, (self.x, self.y))
         self.window.blit(lives_box, (self.x, self.y + self.size))
+
+
+class LostGameBox(ScreenObject):
+
+    font = DEFAULT_FONT
+    color = WHITE
+
+    def __init__(self, x: int, y: int, window: pygame.Surface, id: int):
+        super().__init__(id)
+        self.window = window
+        self.x = x
+        self.y = y
+
+    def update_state(self, screen_handler):
+        pass
+
+    def draw(self, score):
+        msg_size = 50
+        score_box_size = 25
+        msg = pygame.font.SysFont(self.font, msg_size).render(
+            "GAME OVER", True, self.color
+        )
+        score_box = pygame.font.SysFont(self.font, score_box_size).render(
+            f"Score: {score}", True, self.color
+        )
+
+        # Get new coords for score to be centred under message
+        score_y = self.y + msg_size
+        score_x = self.x + (msg.get_width() - score_box.get_width()) // 2
+
+        self.window.blit(msg, (self.x, self.y))
+        self.window.blit(score_box, (score_x, score_y))
