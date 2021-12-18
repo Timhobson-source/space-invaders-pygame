@@ -7,6 +7,8 @@ window:
   bottom_buffer: 10
 
 player:
+  vel: 25
+  radius: 15
   bullet:
     speed: 20
     radius: 3
@@ -17,7 +19,7 @@ enemy:
   shooter_point_value: 20
   shooting_frequency: 0.2
   speed: 5
-  radius: 10
+  radius: 12
   bullet:
     speed: 10
     radius: 3
@@ -26,3 +28,7 @@ enemy:
 scorebox:
   x: 400
   y: 5
+
+meta:
+  start_lives: 3
+  start_points: 0

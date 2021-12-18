@@ -33,7 +33,7 @@ pygame.mixer.init()
 PLAYER_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
 ENEMY_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
 
-YELLOW_INVADER = pygame.image.load('data/images/invader-yellow.png')
+YELLOW_INVADER = pygame.image.load('data/images/invaders-red.png')
 
 
 class ScreenObjectFactory:
@@ -234,9 +234,6 @@ class StandardEnemy(Enemy):
     label_rgb: tuple = BLACK
     point_value = config['enemy']['standard_point_value']
 
-    # def draw(self):
-    #     pygame.draw()
-
 
 class ShootingEnemy(Enemy):
 
@@ -247,8 +244,12 @@ class ShootingEnemy(Enemy):
     shooting_freq = config['enemy']['shooting_frequency']
 
     def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
-        self.last_bullet_time = time.time()
         super().__init__(x, y, vel, radius, window, id)
+        self.last_bullet_time = time.time()
+        self.img = pygame.transform.scale(YELLOW_INVADER, (2*self.radius, 2*self.radius))
+
+    def draw(self):
+        self.window.blit(self.img, (self.x - self.radius, self.y - self.radius))
 
     def update_state(self, screen_handler):
         super().update_state(screen_handler)
@@ -316,6 +317,8 @@ class ScoreBox(ScreenObject):
         lives_box = pygame.font.SysFont(self.font, self.size).render(
             f"Lives: {self.lives}", True, self.color
         )
+        height = lives_box.get_height() + self.size + 2*self.y
+        pygame.draw.rect(self.window, BLACK, pygame.Rect(0, 0, self.window.get_width(), height))
         self.window.blit(score_box, (self.x, self.y))
         self.window.blit(lives_box, (self.x, self.y + self.size))
 

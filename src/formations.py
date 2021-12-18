@@ -23,7 +23,7 @@ def calc_move_counter_level(grid, radius, velocity, right_buffer, width, **kwarg
     return (max_allowed_x_on_screen - max_point_in_grid) // velocity
 
 
-def build_formation(screen_handler, nrows=4, ncols=10):
+def build_enemy_formation(screen_handler, nrows=4, ncols=10):
     from config import get_config
     config = get_config()
 

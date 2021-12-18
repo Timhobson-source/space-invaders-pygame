@@ -24,11 +24,11 @@ HURT_SOUND = pygame.mixer.Sound('data/sounds/beep.wav')
 
 
 class ScreenHandler:
-    def __init__(self, screen: pygame.Surface):
+    def __init__(self, screen: pygame.Surface, game_meta: GameMeta):
         self.screen_objects = []
         self.screen_object_factory = ScreenObjectFactory(self)
         self.screen = screen
-        self.game_meta = GameMeta()
+        self.game_meta = game_meta
 
     def update_screen_state(self):
         if self.player_has_lost():
@@ -66,7 +66,9 @@ class ScreenHandler:
     def draw_end_screen(self, msg: str):
         self.screen.blit(BG, (0, 0))
         self.clear_objects_from_screen()
-        box = self.screen_object_factory.create_end_game_box(150, 200, msg)
+        x = self.screen.get_width() * 2 // 5
+        y = self.screen.get_height() * 2 // 5
+        box = self.screen_object_factory.create_end_game_box(x, y, msg)
         box.draw(self.game_meta.points)
 
     def update_and_draw_objects(self):
