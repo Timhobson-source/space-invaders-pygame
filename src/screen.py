@@ -24,6 +24,8 @@ HURT_SOUND = pygame.mixer.Sound('data/sounds/beep.wav')
 
 
 class ScreenHandler:
+    bg = BG
+
     def __init__(self, screen: pygame.Surface, game_meta: GameMeta):
         self.screen_objects = []
         self.screen_object_factory = ScreenObjectFactory(self)
@@ -31,53 +33,17 @@ class ScreenHandler:
         self.game_meta = game_meta
 
     def update_screen_state(self):
-        if self.player_has_lost():
-            self.game_meta.set_game_lost()
-            self.draw_end_screen('YOU LOST!')
-        elif self.player_has_won():
-            self.game_meta.set_game_won()
-            self.draw_end_screen('YOU WON!')
-        else:
-            self.update_and_draw_objects()
-
-        pygame.display.update()
-
-    def player_has_lost(self):
-        if self.game_meta.game_being_played:
-            max_y = self.screen.get_height(
-            ) - config['window']['bottom_buffer']
-            enemies_land = any(
-                [
-                    obj for obj in self.screen_objects
-                    if isinstance(obj, Enemy) and obj.y >= max_y]
-            )
-            return (not self.game_meta.player_has_lives()) or enemies_land
-        return self.game_meta.lost_state
-
-    def player_has_won(self):
-        if self.game_meta.game_being_played:
-            enemies_defeated = not [obj for obj in self.screen_objects if isinstance(obj, Enemy)]
-            return self.game_meta.player_has_lives and enemies_defeated
-        return self.game_meta.won_state
-
-    def clear_objects_from_screen(self):
-        self.screen_objects = []
-
-    def draw_end_screen(self, msg: str):
-        self.screen.blit(BG, (0, 0))
-        self.clear_objects_from_screen()
-        box = self.screen_object_factory.create_end_game_box(msg)
-        box.draw(self.game_meta.points)
-
-    def update_and_draw_objects(self):
         self.cleanup_off_screen_objects()
         self.handle_player_and_enemy_bullet_collisions()
         self.handle_enemy_and_player_bullet_collisions()
 
-        self.screen.blit(BG, (0, 0))
+        self.screen.blit(self.bg, (0, 0))
         for object in self.screen_objects:
             object.update_state(self)
             object.draw()
+
+    def clear_objects_from_screen(self):
+        self.screen_objects = []
 
     def cleanup_off_screen_objects(self):
         offscreen_objects = [
@@ -135,3 +101,17 @@ class ScreenHandler:
 
     def remove_screen_object(self, object):
         self.screen_objects.remove(object)
+
+    @property
+    def enemies_landed(self):
+        min_y_to_land = self.screen.get_height() - config['window']['bottom_buffer']
+        enemies_landed = [
+            obj for obj in self.screen_objects
+            if isinstance(obj, Enemy)
+            if obj.y > min_y_to_land
+        ]
+        return enemies_landed
+
+    @property
+    def enemies(self):
+        return [obj for obj in self.screen_objects if isinstance(obj, Enemy)]

@@ -8,7 +8,7 @@ window:
   bottom_buffer: 10
 
 player:
-  vel: 25
+  vel: 15
   radius: 15
   bullet:
     speed: 20
@@ -19,7 +19,7 @@ enemy:
   standard_point_value: 10
   shooter_point_value: 20
   shooting_frequency: 0.2
-  speed: 25
+  speed: 30
   radius: 12
   move_recoil: 1000
   bullet:
