@@ -385,8 +385,10 @@ class EndGameBox(ScreenObject):
 
 class StartGameBox(ScreenObject):
 
-    font = DEFAULT_FONT
-    color = WHITE
+    title_font = 'lucidasans'
+    msg_font = DEFAULT_FONT
+    title_color = PURPLE
+    msg_color = WHITE
     title_size = 50
     msg_size = 25
     message = "Press any key to start."
@@ -404,12 +406,12 @@ class StartGameBox(ScreenObject):
         pass
 
     def draw(self):
-        title = pygame.font.SysFont(self.font, self.title_size).render(
-            self.title, True, self.color
+        title = pygame.font.SysFont(self.title_font, self.title_size).render(
+            self.title, True, self.title_color
         )
 
-        msg = pygame.font.SysFont(self.font, self.msg_size).render(
-            self.message, True, self.color
+        msg = pygame.font.SysFont(self.msg_font, self.msg_size).render(
+            self.message, True, self.msg_color
         )
 
         # Get new coords for score to be centred under message
@@ -417,7 +419,7 @@ class StartGameBox(ScreenObject):
         title_x = self.x - title.get_width() // 2
         title_y = self.y - title.get_height()
 
-        msg_y = self.title_size + title_y
+        msg_y = title.get_height() + title_y + 20
         msg_x = self.x - msg.get_width() // 2
 
         self.window.blit(title, (title_x, title_y))
