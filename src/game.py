@@ -15,6 +15,7 @@ class Game:
         self.config = get_config()
         pygame.mixer.music.load('data/sounds/main_music.mp3')
         pygame.mixer.music.play(loops=-1)
+        pygame.mixer.music.set_volume(0.25)
 
     def create_screen(self):
         window = pygame.display.set_mode(

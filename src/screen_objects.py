@@ -31,7 +31,9 @@ DEFAULT_FONT = pygame.font.get_default_font()
 # sounds down the line
 pygame.mixer.init()
 PLAYER_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
+PLAYER_SHOOT_SOUND.set_volume(4)
 ENEMY_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
+ENEMY_SHOOT_SOUND.set_volume(4)
 
 RED_INVADER = pygame.image.load('data/images/invaders-red.png')
 YELLOW_INVADER = pygame.image.load('data/images/invaders-yellow.gif')
@@ -266,7 +268,7 @@ class ShootingEnemy(Enemy):
     def update_state(self, screen_handler):
         super().update_state(screen_handler)
 
-        recoil = ENEMY_SHOOTING_RECOIL_TIME + 1000 * random.random()
+        recoil = ENEMY_SHOOTING_RECOIL_TIME + 1000 * (2 * random.random() - 1)
 
         cur_time = pygame.time.get_ticks()
         if cur_time - self.last_bullet_time > recoil:

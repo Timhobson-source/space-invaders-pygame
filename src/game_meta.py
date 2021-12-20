@@ -13,6 +13,12 @@ class GameMeta:
     def increase_points(self, increase):
         self.points += increase
 
+    def lose_points(self, decrease):
+        if self.points < decrease:
+            self.points = 0
+        else:
+            self.points -= decrease
+
     def player_has_lives(self):
         return self.lives > 0
 

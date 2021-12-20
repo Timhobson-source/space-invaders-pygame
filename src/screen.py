@@ -20,7 +20,9 @@ BG = pygame.transform.scale(
 )
 
 EXPLOSION_SOUND = pygame.mixer.Sound('data/sounds/explosion.wav')
+EXPLOSION_SOUND.set_volume(0.2)
 HURT_SOUND = pygame.mixer.Sound('data/sounds/beep.wav')
+HURT_SOUND.set_volume(4)
 
 
 class ScreenHandler:
@@ -94,6 +96,7 @@ class ScreenHandler:
                     pygame.mixer.Sound.play(HURT_SOUND)
                     # TODO - add temporary color change for player object
                     self.game_meta.lose_life()
+                    self.game_meta.lose_points(50)
                     self.remove_screen_object(bullet)
 
     def register_screen_object(self, object):
