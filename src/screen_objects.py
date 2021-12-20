@@ -90,6 +90,12 @@ class ScreenObjectFactory:
         self.screen_handler.register_screen_object(obj)
         return obj
 
+    def create_start_game_box(self):
+        args = [self.screen_handler.screen]
+        obj = self.create(StartGameBox, *args)
+        self.screen_handler.register_screen_object(obj)
+        return obj
+
 
 class ScreenObject(ABC):
 
@@ -375,3 +381,44 @@ class EndGameBox(ScreenObject):
 
         self.window.blit(msg, (msg_x, msg_y))
         self.window.blit(score_box, (score_x, score_y))
+
+
+class StartGameBox(ScreenObject):
+
+    font = DEFAULT_FONT
+    color = WHITE
+    title_size = 50
+    msg_size = 25
+    message = "Press any key to start."
+    title = "Space Invaders!"
+
+    def __init__(self, window: pygame.Surface, id: int):
+        super().__init__(id)
+        self.window = window
+
+        # get x and y values for centre of screen
+        self.y = window.get_height() // 2
+        self.x = window.get_width() // 2
+
+    def update_state(self, screen_handler):
+        pass
+
+    def draw(self):
+        title = pygame.font.SysFont(self.font, self.title_size).render(
+            self.title, True, self.color
+        )
+
+        msg = pygame.font.SysFont(self.font, self.msg_size).render(
+            self.message, True, self.color
+        )
+
+        # Get new coords for score to be centred under message
+        # self.x and self.y are centre of screen
+        title_x = self.x - title.get_width() // 2
+        title_y = self.y - title.get_height()
+
+        msg_y = self.title_size + title_y
+        msg_x = self.x - msg.get_width() // 2
+
+        self.window.blit(title, (title_x, title_y))
+        self.window.blit(msg, (msg_x, msg_y))

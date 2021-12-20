@@ -24,10 +24,24 @@ class Game:
         pygame.display.set_caption("Game!")
         return window
 
-    def prepare_screen(self, screen_handler: ScreenHandler):
+    def prepare_game_screen(self, screen_handler: ScreenHandler):
         self.build_score_box(screen_handler)
         self.build_player(screen_handler)
         self.build_enemy_formation(screen_handler)
+
+    def show_home_screen(self, screen_handler: ScreenHandler):
+        home_screen = screen_handler.display_home_screen()
+        pygame.display.update()
+        running = True
+        while running:
+            pygame.time.delay(50)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
+                if event.type == pygame.KEYDOWN:
+                    running = False
+        screen_handler.remove_screen_object(home_screen)
 
     def build_score_box(self, screen_handler: ScreenHandler):
         screen_handler.screen_object_factory.create_score_box(**self.config['scorebox'])
@@ -57,7 +71,9 @@ class Game:
 
         self.game_meta = GameMeta(**self.config['meta'])
         screen_handler = ScreenHandler(window, self.game_meta)
-        self.prepare_screen(screen_handler)
+
+        self.show_home_screen(screen_handler)
+        self.prepare_game_screen(screen_handler)
 
         running = True
         while running:

@@ -105,6 +105,12 @@ class ScreenHandler:
     def remove_screen_object(self, object):
         self.screen_objects.remove(object)
 
+    def display_home_screen(self):
+        self.screen.blit(self.bg, (0, 0))
+        home_screen = self.screen_object_factory.create_start_game_box()
+        home_screen.draw()
+        return home_screen
+
     @property
     def enemies_landed(self):
         min_y_to_land = self.screen.get_height() - config['window']['bottom_buffer']
