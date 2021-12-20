@@ -8,10 +8,13 @@ from src.formations import build_enemy_formation
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, fps=60):
         pygame.init()
         pygame.font.init()
+        self.clock = pygame.time.Clock()
         self.config = get_config()
+        pygame.mixer.music.load('data/sounds/main_music.mp3')
+        pygame.mixer.music.play()
 
     def create_screen(self):
         window = pygame.display.set_mode(
@@ -30,7 +33,7 @@ class Game:
 
     def build_enemy_formation(self, screen_handler: ScreenHandler):
         # TODO - put the formation logic here now?
-        build_enemy_formation(screen_handler)
+        build_enemy_formation(screen_handler, **self.config)
 
     def build_player(self, screen_handler: ScreenHandler):
         height = screen_handler.screen.get_height()
@@ -63,5 +66,6 @@ class Game:
                 running = False
 
             screen_handler.update_screen_state()
+            self.clock.tick(self.config['window']['fps'])
 
         pygame.quit()

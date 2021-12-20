@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from functools import cached_property
-import time
 import random
 
 import pygame
@@ -161,7 +160,7 @@ class Player(Character):
     label_rgb: tuple = WHITE
 
     def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
-        self.last_bullet_time = None
+        self.last_bullet_time = 0
         super().__init__(x, y, vel, radius, window, id)
 
     def update_state(self, screen_handler):
@@ -189,9 +188,8 @@ class Player(Character):
         bullet_speed = config['player']['bullet']['speed']
         bullet_radius = config['player']['bullet']['radius']
 
-        cur_time = time.time()
-        if not self.last_bullet_time or (
-                cur_time - self.last_bullet_time > PLAYER_SHOOTING_RECOIL_TIME):
+        cur_time = pygame.time.get_ticks()
+        if cur_time - self.last_bullet_time > PLAYER_SHOOTING_RECOIL_TIME:
 
             # play shooting sound effect
             pygame.mixer.Sound.play(PLAYER_SHOOT_SOUND)
@@ -206,14 +204,17 @@ class Player(Character):
 class Enemy(Character):
     """Trivial class for all enemies to inherit from."""
 
+    move_recoil = config['enemy']['move_recoil']
+
     def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
         self.direction = 1
         self.move_counter = 0
         self.move_counter_max_level = None
         self.lead_enemy = None
+        self.last_move_time = 0
         super().__init__(x, y, vel, radius, window, id)
 
-    @cached_property
+    @ cached_property
     def img(self):
         return pygame.transform.scale(self.raw_img, (2*self.radius, 2*self.radius))
 
@@ -227,13 +228,17 @@ class Enemy(Character):
         if self.move_counter is None:
             raise ValueError("Move counter level must be set for enemy object post initialisation!")
 
-        if self.move_counter == self.move_counter_max_level:
-            self.y += 4 * self.vel  # move down
-            self.direction *= -1  # switch direction
-            self.move_counter = 0  # reset move counter
-        else:
-            self.x += self.direction * self.vel
-            self.move_counter += 1
+        cur_time = pygame.time.get_ticks()
+        if cur_time - self.last_move_time > self.move_recoil:
+            self.last_move_time = cur_time
+
+            if self.move_counter == self.move_counter_max_level:
+                self.y += self.vel  # move down
+                self.direction *= -1  # switch direction
+                self.move_counter = 0  # reset move counter
+            else:
+                self.x += self.direction * self.vel
+                self.move_counter += 1
 
 
 class StandardEnemy(Enemy):
@@ -256,14 +261,14 @@ class ShootingEnemy(Enemy):
 
     def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
         super().__init__(x, y, vel, radius, window, id)
-        self.last_bullet_time = time.time()
+        self.last_bullet_time = pygame.time.get_ticks()
 
     def update_state(self, screen_handler):
         super().update_state(screen_handler)
 
-        recoil = ENEMY_SHOOTING_RECOIL_TIME + random.random()
+        recoil = ENEMY_SHOOTING_RECOIL_TIME + 1000 * random.random()
 
-        cur_time = time.time()
+        cur_time = pygame.time.get_ticks()
         if cur_time - self.last_bullet_time > recoil:
             if random.random() < self.shooting_freq:
                 self.shoot(screen_handler)
