@@ -81,8 +81,8 @@ class ScreenObjectFactory:
         self.screen_handler.register_screen_object(obj)
         return obj
 
-    def create_end_game_box(self, x: int, y: int, message: str):
-        args = [x, y, message, self.screen_handler.screen]
+    def create_end_game_box(self, message: str):
+        args = [message, self.screen_handler.screen]
         obj = self.create(EndGameBox, *args)
         self.screen_handler.register_screen_object(obj)
         return obj
@@ -328,12 +328,14 @@ class EndGameBox(ScreenObject):
     font = DEFAULT_FONT
     color = WHITE
 
-    def __init__(self, x: int, y: int, message: str, window: pygame.Surface, id: int):
+    def __init__(self, message: str, window: pygame.Surface, id: int):
         super().__init__(id)
         self.window = window
-        self.x = x
-        self.y = y
         self.message = message
+
+        # get x and y values for centre of screen
+        self.y = window.get_height() // 2
+        self.x = window.get_width() // 2
 
     def update_state(self, screen_handler):
         pass
@@ -344,13 +346,18 @@ class EndGameBox(ScreenObject):
         msg = pygame.font.SysFont(self.font, msg_size).render(
             self.message, True, self.color
         )
+
         score_box = pygame.font.SysFont(self.font, score_box_size).render(
             f"Score: {score}", True, self.color
         )
 
         # Get new coords for score to be centred under message
-        score_y = self.y + msg_size
-        score_x = self.x + (msg.get_width() - score_box.get_width()) // 2
+        # self.x and self.y are centre of screen
+        msg_x = self.x - msg.get_width() // 2
+        msg_y = self.y - msg.get_height()
 
-        self.window.blit(msg, (self.x, self.y))
+        score_y = msg_size + msg_y
+        score_x = self.x - score_box.get_width() // 2
+
+        self.window.blit(msg, (msg_x, msg_y))
         self.window.blit(score_box, (score_x, score_y))

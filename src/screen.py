@@ -66,9 +66,7 @@ class ScreenHandler:
     def draw_end_screen(self, msg: str):
         self.screen.blit(BG, (0, 0))
         self.clear_objects_from_screen()
-        x = self.screen.get_width() * 2 // 5
-        y = self.screen.get_height() * 2 // 5
-        box = self.screen_object_factory.create_end_game_box(x, y, msg)
+        box = self.screen_object_factory.create_end_game_box(msg)
         box.draw(self.game_meta.points)
 
     def update_and_draw_objects(self):

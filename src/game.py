@@ -1,7 +1,7 @@
 import pygame
 
 from config import get_config
-from game_meta import GameMeta
+from src.game_meta import GameMeta
 
 from src.screen import ScreenHandler
 from src.formations import build_enemy_formation
