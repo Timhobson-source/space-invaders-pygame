@@ -1,6 +1,5 @@
 import pygame
 
-from config import get_config
 from src.game_meta import GameMeta
 
 from src.screen import ScreenHandler
@@ -8,11 +7,11 @@ from src.formations import build_enemy_formation
 
 
 class Game:
-    def __init__(self, fps=60):
+    def __init__(self, **config):
         pygame.init()
         pygame.font.init()
         self.clock = pygame.time.Clock()
-        self.config = get_config()
+        self.config = config
         pygame.mixer.music.load('data/sounds/main_music.mp3')
         pygame.mixer.music.play(loops=-1)
         pygame.mixer.music.set_volume(0.25)
