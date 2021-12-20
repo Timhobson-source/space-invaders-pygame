@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from functools import cached_property
 import time
 import random
 
@@ -33,7 +34,8 @@ pygame.mixer.init()
 PLAYER_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
 ENEMY_SHOOT_SOUND = pygame.mixer.Sound("data/sounds/shoot-sound.wav")
 
-YELLOW_INVADER = pygame.image.load('data/images/invaders-red.png')
+RED_INVADER = pygame.image.load('data/images/invaders-red.png')
+YELLOW_INVADER = pygame.image.load('data/images/invaders-yellow.gif')
 
 
 class ScreenObjectFactory:
@@ -211,6 +213,13 @@ class Enemy(Character):
         self.lead_enemy = None
         super().__init__(x, y, vel, radius, window, id)
 
+    @cached_property
+    def img(self):
+        return pygame.transform.scale(self.raw_img, (2*self.radius, 2*self.radius))
+
+    def draw(self):
+        self.window.blit(self.img, (self.x - self.radius, self.y - self.radius))
+
     def set_move_counter_max_level(self, level: int):
         self.move_counter_max_level = level
 
@@ -233,6 +242,7 @@ class StandardEnemy(Enemy):
     label: str = 'X'
     label_rgb: tuple = BLACK
     point_value = config['enemy']['standard_point_value']
+    raw_img = YELLOW_INVADER
 
 
 class ShootingEnemy(Enemy):
@@ -242,14 +252,11 @@ class ShootingEnemy(Enemy):
     label_rgb: tuple = BLACK
     point_value = config['enemy']['shooter_point_value']
     shooting_freq = config['enemy']['shooting_frequency']
+    raw_img = RED_INVADER
 
     def __init__(self, x: int, y: int, vel: int, radius: int, window: pygame.Surface, id: int):
         super().__init__(x, y, vel, radius, window, id)
         self.last_bullet_time = time.time()
-        self.img = pygame.transform.scale(YELLOW_INVADER, (2*self.radius, 2*self.radius))
-
-    def draw(self):
-        self.window.blit(self.img, (self.x - self.radius, self.y - self.radius))
 
     def update_state(self, screen_handler):
         super().update_state(screen_handler)
