@@ -81,6 +81,8 @@ class Game:
 
             if any(event.type == pygame.QUIT for event in pygame.event.get()):
                 running = False
+            if pygame.key.get_pressed()[pygame.K_q]:
+                running = False
 
             if self.player_has_lost(screen_handler):
                 self.game_meta.set_game_lost()
