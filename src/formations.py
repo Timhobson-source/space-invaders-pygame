@@ -32,6 +32,7 @@ def build_enemy_formation(screen_handler, nrows=4, ncols=10):
     grid = build_formation_grid(nrows=nrows, ncols=ncols, **config['window'], **config['enemy'])
     move_counter_level = calc_move_counter_level(
         grid=grid, velocity=vel, **config['enemy'], **config['window'])
+
     first_layer_y = min([y for x, y in grid])
     for x, y in grid:
         if y == first_layer_y:

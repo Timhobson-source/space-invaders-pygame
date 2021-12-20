@@ -231,6 +231,7 @@ class Enemy(Character):
             self.y += 4 * self.vel  # move down
             self.direction *= -1  # switch direction
             self.move_counter = 0  # reset move counter
+            self.vel += 3  # increase velocity as enemy gets closer
         else:
             self.x += self.direction * self.vel
             self.move_counter += 1
