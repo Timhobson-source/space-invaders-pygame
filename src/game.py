@@ -54,8 +54,8 @@ class Game:
     def play(self):
         window = self.create_screen()
 
-        game_meta = GameMeta(**self.config['meta'])
-        screen_handler = ScreenHandler(window, game_meta)
+        self.game_meta = GameMeta(**self.config['meta'])
+        screen_handler = ScreenHandler(window, self.game_meta)
         self.prepare_screen(screen_handler)
 
         running = True
@@ -65,7 +65,37 @@ class Game:
             if any(event.type == pygame.QUIT for event in pygame.event.get()):
                 running = False
 
-            screen_handler.update_screen_state()
+            if self.player_has_lost(screen_handler):
+                self.game_meta.set_game_lost()
+                pygame.mixer.music.fadeout(5000)
+                self.draw_end_screen(screen_handler, 'YOU LOST!')
+            elif self.player_has_won(screen_handler):
+                self.game_meta.set_game_won()
+                pygame.mixer.music.fadeout(5000)
+                self.draw_end_screen(screen_handler, 'YOU WON!')
+            else:
+                screen_handler.update_screen_state()
+
+            pygame.display.update()
+
             self.clock.tick(self.config['window']['fps'])
 
         pygame.quit()
+
+    def player_has_lost(self, screen_handler):
+        if self.game_meta.game_being_played:
+            enemies_landed = any(screen_handler.enemies_landed)
+            return (not self.game_meta.player_has_lives()) or enemies_landed
+        return self.game_meta.lost_state
+
+    def player_has_won(self, screen_handler):
+        if self.game_meta.game_being_played:
+            enemies_defeated = not screen_handler.enemies
+            return self.game_meta.player_has_lives and enemies_defeated
+        return self.game_meta.won_state
+
+    def draw_end_screen(self, screen_handler, msg: str):
+        screen_handler.screen.blit(screen_handler.bg, (0, 0))
+        screen_handler.clear_objects_from_screen()
+        box = screen_handler.screen_object_factory.create_end_game_box(msg)
+        box.draw(self.game_meta.points)
