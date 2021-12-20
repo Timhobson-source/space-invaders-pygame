@@ -8,10 +8,10 @@ window:
   bottom_buffer: 10
 
 player:
-  vel: 25
+  vel: 15
   radius: 15
   bullet:
-    speed: 35
+    speed: 20
     radius: 3
     recoil: 100
 

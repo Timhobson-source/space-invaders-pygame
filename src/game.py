@@ -14,7 +14,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.config = get_config()
         pygame.mixer.music.load('data/sounds/main_music.mp3')
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(loops=-1)
 
     def create_screen(self):
         window = pygame.display.set_mode(
