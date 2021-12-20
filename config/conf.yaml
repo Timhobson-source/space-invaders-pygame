@@ -1,4 +1,5 @@
 window:
+  fps: 60
   width: 500
   height: 500
   left_buffer: 25
@@ -12,18 +13,19 @@ player:
   bullet:
     speed: 20
     radius: 3
-    recoil: 0.1
+    recoil: 100
 
 enemy:
   standard_point_value: 10
   shooter_point_value: 20
   shooting_frequency: 0.2
-  speed: 5
+  speed: 25
   radius: 12
+  move_recoil: 1000
   bullet:
     speed: 10
     radius: 3
-    recoil: 1.5
+    recoil: 1500
 
 scorebox:
   x: 400
